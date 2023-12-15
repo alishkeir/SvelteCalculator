@@ -1,26 +1,121 @@
 <script lang="ts">
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.'];
   const operations = ['/', 'x', '-', '+', '='];
+
+  let selectedOperation = '';
+  let display = '';
+  let firstNumber = '';
+  let secondNumber = '';
+  // let isDisplayingResults = false;
+
+  const handleOperationClick = (operation: string) => {
+    if (!firstNumber) return;
+
+    if (operation === '=') {
+      if (!secondNumber) return;
+
+      const firstNum = parseFloat(firstNumber);
+      const secondNum = parseFloat(secondNumber);
+
+      let results = '';
+
+      switch (selectedOperation) {
+        case '/':
+          results = (firstNum / secondNum).toFixed(
+            Number.isInteger(firstNum / secondNum) ? 0 : 2
+          );
+          break;
+        case 'x':
+          results = (firstNum * secondNum).toFixed(
+            Number.isInteger(firstNum * secondNum) ? 0 : 2
+          );
+          break;
+        case '+':
+          results = (firstNum + secondNum).toFixed(
+            Number.isInteger(firstNum + secondNum) ? 0 : 2
+          );
+          break;
+        case '-':
+          results = (firstNum - secondNum).toFixed(
+            Number.isInteger(firstNum - secondNum) ? 0 : 2
+          );
+          break;
+      }
+
+      display = results;
+      // isDisplayingResults = true;
+      selectedOperation = '';
+      firstNumber = results;
+      secondNumber = '';
+    } else {
+      if (selectedOperation && secondNumber) {
+        // Evaluate the expression before proceeding with the new operation
+        handleOperationClick('=');
+      }
+      selectedOperation = operation;
+    }
+  };
+
+  const handleClear = () => {
+    firstNumber = '';
+    secondNumber = '';
+    selectedOperation = '';
+    display = '';
+    // isDisplayingResults = false;
+  };
+
+  const handleNumberClick = (number: string) => {
+    // if (isDisplayingResults) {
+    //   handleClear();
+    // }
+    if (display === '' && number === '0') return;
+    if (number === '.' && display.includes('.')) return;
+
+    if (!selectedOperation) {
+      if (display === '' && number === '.') {
+        firstNumber = '0.';
+        return (display = firstNumber);
+      }
+      firstNumber = `${firstNumber}${number}`;
+      return (display = firstNumber);
+    } else {
+      if (display === '' && number === '.') {
+        secondNumber = '0.';
+        return (display = secondNumber);
+      }
+      secondNumber = `${secondNumber}${number}`;
+      return (display = secondNumber);
+    }
+  };
 </script>
 
 <main>
   <div class="calculator">
-    <div class="results"></div>
+    <div class="results">
+      {display}
+    </div>
     <div class="digits">
       <div class="numbers">
-        <button class="btn btn-xlg">C</button>
+        <button class="btn btn-xlg" on:click={handleClear}> C </button>
         {#each numbers as number (number)}
-          <!-- content here -->
-          <button class={`btn ${number === '0' ? 'btn-lg' : null}`}>
+          <button
+            class={`btn ${number === '0' ? 'btn-lg' : null}`}
+            on:click={() => handleNumberClick(number)}
+          >
             {number}
           </button>
         {/each}
       </div>
-
       <div class="operations">
         {#each operations as operation (operation)}
-          <!-- content here -->
-          <button class="btn btn-orange">{operation}</button>
+          <button
+            class={`btn ${
+              operation === selectedOperation ? 'btn-silver' : 'btn-orange'
+            }`}
+            on:click={() => handleOperationClick(operation)}
+          >
+            {operation}
+          </button>
         {/each}
       </div>
     </div>
@@ -63,7 +158,6 @@
     color: white;
     margin: 5px;
     border: none;
-    user-select: none;
   }
   .btn-lg {
     width: 110px;
