@@ -65,9 +65,6 @@
   };
 
   const handleNumberClick = (number: string) => {
-    // if (isDisplayingResults) {
-    //   handleClear();
-    // }
     if (display === '' && number === '0') return;
     if (number === '.' && display.includes('.')) return;
 
@@ -79,7 +76,7 @@
       firstNumber = `${firstNumber}${number}`;
       return (display = firstNumber);
     } else {
-      if (display === '' && number === '.') {
+      if (number === '.') {
         secondNumber = '0.';
         return (display = secondNumber);
       }
