@@ -2,94 +2,70 @@
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.'];
   const operations = ['/', 'x', '-', '+', '='];
 
+  let previous = '';
+  let current = '';
   let selectedOperation = '';
-  let display = '';
-  let firstNumber = '';
-  let secondNumber = '';
-  // let isDisplayingResults = false;
 
   const handleOperationClick = (operation: string) => {
-    if (!firstNumber) return;
+    if (!current) return;
+
+    let results = '';
+    const oldNum = parseFloat(previous);
+    const newNum = parseFloat(current);
+    previous = current;
 
     if (operation === '=') {
-      if (!secondNumber) return;
-
-      const firstNum = parseFloat(firstNumber);
-      const secondNum = parseFloat(secondNumber);
-
-      let results = '';
+      if (!previous) return;
 
       switch (selectedOperation) {
         case '/':
-          results = (firstNum / secondNum).toFixed(
-            Number.isInteger(firstNum / secondNum) ? 0 : 2
-          );
+          results = parseFloat((oldNum / newNum).toFixed(4)).toString();
           break;
+
         case 'x':
-          results = (firstNum * secondNum).toFixed(
-            Number.isInteger(firstNum * secondNum) ? 0 : 2
-          );
+          results = parseFloat((oldNum * newNum).toFixed(4)).toString();
           break;
+
         case '+':
-          results = (firstNum + secondNum).toFixed(
-            Number.isInteger(firstNum + secondNum) ? 0 : 2
-          );
+          results = parseFloat((oldNum + newNum).toFixed(4)).toString();
           break;
+
         case '-':
-          results = (firstNum - secondNum).toFixed(
-            Number.isInteger(firstNum - secondNum) ? 0 : 2
-          );
+          results = parseFloat((oldNum - newNum).toFixed(4)).toString();
           break;
       }
 
-      display = results;
-      // isDisplayingResults = true;
-      selectedOperation = '';
-      firstNumber = results;
-      secondNumber = '';
+      current = results;
     } else {
-      if (selectedOperation && secondNumber) {
+      if (selectedOperation && previous) {
         // Evaluate the expression before proceeding with the new operation
         handleOperationClick('=');
       }
-      selectedOperation = operation;
+
+      current = '';
     }
+
+    selectedOperation = operation;
   };
 
   const handleClear = () => {
-    firstNumber = '';
-    secondNumber = '';
     selectedOperation = '';
-    display = '';
-    // isDisplayingResults = false;
+    previous = '';
+    current = '';
   };
 
   const handleNumberClick = (number: string) => {
-    if (display === '' && number === '0') return;
-    if (number === '.' && display.includes('.')) return;
+    if (number === '.' && current.includes('.')) return;
+    if (number === '.' && current == '') return (current += '0.');
 
-    if (!selectedOperation) {
-      if (display === '' && number === '.') {
-        firstNumber = '0.';
-        return (display = firstNumber);
-      }
-      firstNumber = `${firstNumber}${number}`;
-      return (display = firstNumber);
-    } else {
-      if (number === '.') {
-        secondNumber = '0.';
-        return (display = secondNumber);
-      }
-      secondNumber = `${secondNumber}${number}`;
-      return (display = secondNumber);
-    }
+    current += number;
   };
 </script>
 
 <main>
   <div class="calculator">
     <div class="results">
-      {display}
+      {current}
     </div>
     <div class="digits">
       <div class="numbers">
@@ -171,9 +147,10 @@
   .results {
     height: 60px;
     color: white;
-    font-size: 50px;
+    font-size: 30px;
     display: flex;
     flex-direction: row-reverse;
     margin-right: 10px;
+    line-height: 2;
   }
 </style>
